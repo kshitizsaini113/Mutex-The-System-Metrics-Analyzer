@@ -35,4 +35,19 @@ class Util
 
 };
 
+string Util::convertToTime( long int epoch_time )
+{
+    long minutes = epoch_time / 60;
+    long hours = minutes / 60;
+    long seconds = int( epoch_time % 60 );
+    minutes = ( minutes % 60 );
+    // Converts the epoch time to minutes, hours and seconds by performing the arithmetic operations.
+
+    string time_string = to_string(hours) + ":" + to_string(minutes) + ":" + to_string(seconds);
+    // Converts the stored resut to string.
+
+    return time_string;
+    // Returns the converted time as string.
+}
+
 #endif

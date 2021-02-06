@@ -50,4 +50,31 @@ string Util::convertToTime( long int epoch_time )
     // Returns the converted time as string.
 }
 
+string Util::getProgressBar( string percent )
+{
+    string progress_bar = "0% ";
+    int size = 50;
+    int boundaries = ( ( stoi(percent) * size ) / 100);
+    // Converts the percentage to boundary so as to use the bounday accordingly.
+
+    for( int i = 0; i < size; i++ )
+    {
+        if( i<= boundaries )
+        {
+            progress_bar += "|";
+        }
+        else
+        {
+            progress_bar += " ";
+        }
+    }
+    // Stores the result as either " " or "|" to display the characterstics accordingly.
+
+    progress_bar += " " + percent.substr( 0, 5 ) + "%/100%";
+    // Adds the final result.
+
+    return progress_bar;
+    // Returnd the full fledged progress bar.
+}
+
 #endif

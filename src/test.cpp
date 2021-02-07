@@ -25,5 +25,14 @@ int main()
         cout << endl;
     }
 
+    if ( TestUtils::testGetStream() )
+    {
+        cout << endl;
+        cout << "=================================================================" << endl;
+        cout << "----------------- Get Stream Tested Succesfully -----------------" << endl;
+        cout << "=================================================================" << endl;
+        cout << endl;
+    }
+
     return 0; 
 }

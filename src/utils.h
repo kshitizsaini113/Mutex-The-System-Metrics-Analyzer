@@ -77,4 +77,19 @@ string Util::getProgressBar( string percent )
     // Returnd the full fledged progress bar.
 }
 
+ifstream Util::getStream( string path )
+{
+    ifstream file_present(path);
+    // Opens the path and stored the refrence in stream variable.
+
+    if( !file_present )
+    {
+        throw runtime_error( "Non - Existing PID" );
+    }
+    // Prompts a runtime error if the the file isn't present at the path.
+
+    return file_present;
+    // Returns the refrence to the file.
+}
+
 #endif

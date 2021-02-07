@@ -18,4 +18,19 @@ class TestUtils
 
             return true;
         }
+
+        static bool testProgressBar()
+        {
+            assert( Util::getProgressBar("0") == "0% |                                                  0%/100%");
+            assert( Util::getProgressBar("5") == "0% |||                                                5%/100%");
+            assert( Util::getProgressBar("10") == "0% ||||||                                             10%/100%");
+            assert( Util::getProgressBar("30") == "0% ||||||||||||||||                                   30%/100%");
+            assert( Util::getProgressBar("50") == "0% ||||||||||||||||||||||||||                         50%/100%");
+            assert( Util::getProgressBar("70") == "0% ||||||||||||||||||||||||||||||||||||               70%/100%");
+            assert( Util::getProgressBar("90") == "0% ||||||||||||||||||||||||||||||||||||||||||||||     90%/100%");
+            assert( Util::getProgressBar("100") == "0% |||||||||||||||||||||||||||||||||||||||||||||||||| 100%/100%");
+
+            return true;
+        }
+
 };

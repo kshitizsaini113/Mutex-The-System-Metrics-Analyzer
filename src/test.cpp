@@ -16,5 +16,14 @@ int main()
         cout << endl;
     }
 
+    if ( TestUtils::testProgressBar() )
+    {
+        cout << endl;
+        cout << "=================================================================" << endl;
+        cout << "---------------- Progress Bar Tested Succesfully ----------------" << endl;
+        cout << "=================================================================" << endl;
+        cout << endl;
+    }
+
     return 0; 
 }

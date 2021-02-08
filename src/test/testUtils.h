@@ -33,4 +33,12 @@ class TestUtils
             return true;
         }
 
+        static bool testGetStream()
+        {
+            system("touch /tmp/testFile.txt");
+            Util::getStream("/tmp/testFile.txt");
+
+            return true;
+        }
+
 };

@@ -117,3 +117,55 @@ class ProcessParcer
         // accepts two arguments previousTime and currentTime.
 
 };
+
+string ProcessParcer::getProcessCpuPercent( string processId )
+{
+    string fetchedLine;
+    string value;
+    float processCpuPercent;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + processId + "/" + Path::statPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    getline( fileStream, fetchedLine );
+    // The file is a single line file so we will fetch the file in a single line.
+
+    istringstream buffer( fetchedLine );
+    istream_iterator<string> begin( buffer ), end;
+    vector<string> values( begin, end );
+    // Processes the given line and stores it in a vector of strings by accessing the element.
+
+    float utime = stof(ProcessParcer::getProcessUpTime( processId ));
+    float uptime = ProcessParcer::getSystemUpTime();
+    // Uses the pre-defined functions to get the values of variables like process uptime and system
+    // uptime.
+
+    float stime = stof( values[14] );
+    // Measures the amount of time that this process has been scheduled in kernel mode, measured in
+    // clock ticks (divide by sysconf(_SC_CLK_TCK)).
+    float cutime = stof( values[15] );
+    // Measures the amount of time that this process's waited-for children have been scheduled in
+    // user mode, measured in clock ticks (divide by sysconf(_SC_CLK_TCK)).
+    float cstime = stof( values[16] );
+    // Measures the amount of time that this process's waited-for children have been scheduled in
+    // kernel mode, measured in clock ticks (divide by sysconf(_SC_CLK_TCK)).
+    float starttime = stof( values[21] );
+    // Measures the time the process started after system boot. The value is expressed in clock ticks
+    // (divide by sysconf(_SC_CLK_TCK)).
+
+    float freq = sysconf( _SC_CLK_TCK );
+    // Stores the system clock tick frequency. Mostly the System clock tick frequency is 100.
+
+    float totaltime = utime + stime + cutime + cstime;
+    // Calculates the total time while the process is running in CPU. The time is in system tick freq.
+    float processTotalTime = uptime - ( starttime / freq );
+    // Calculates the seconds elapsed since the process was started first.
+
+    processCpuPercent = 100 * ( ( totaltime / freq ) / processTotalTime );
+    // Calculates the cpu percent for the current process.
+
+    return to_string( processCpuPercent );
+    // Returns the process cpu percent in form of string.
+}
+

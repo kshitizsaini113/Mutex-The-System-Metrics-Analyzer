@@ -117,3 +117,35 @@ class ProcessParcer
         // accepts two arguments previousTime and currentTime.
 
 };
+
+string ProcessParcer::getProcessRamPercent( string processId )
+{
+    string fetchedLine;
+    string fieldName = "VmData";
+    float ramUsage = 0;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + processId + Path::statusPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+        // Gets a new line everytime and iterates over the file till the field VmData is found.
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+            // Processes the given line and stores it in a vector of strings by accessing the element
+            // over the index 1 and further converting it to GB, as the fetched data is in kB.
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+
+            ramUsage = ( stof( values[1] ) / float( 1024 * 1024 ) );
+            // Converts the string to float value and convert it from kB to GB.
+
+            break;
+        }
+    }
+
+    return to_string( ramUsage );
+    // Returns the RAM Usage in form of string.
+}

@@ -117,3 +117,54 @@ class ProcessParcer
         // accepts two arguments previousTime and currentTime.
 
 };
+
+vector<string> ProcessParcer::getProcessIdList()
+{
+    vector<string> processList;
+    DIR* directory;
+    // Initializes the basic variables required for the functionality. Here the variable is a directory pointer so
+    // we will open the directory and parse the files in it using the directory pointer.
+
+    if(!(directory = opendir("/proc")))
+    {
+    // Open the directory and throws an error if something is now working fine. 
+        throw::runtime_error(strerror(errno));
+    }
+
+    while ( dirent* internalFile = readdir(directory) )
+    {
+    // Uses the dirent structure to read the files inside the directory and uses the loop to iterate through
+    // each of the files in the directory.
+        
+        if ( internalFile->d_type != DT_DIR )
+        {
+        // Skips the file and continue to next iteration id the file is not a directory as we need only the 
+        // directories to process.
+            
+            continue;
+            // Continues to the next iteration.
+        }
+
+        if(std::all_of( internalFile->d_name, internalFile->d_name + std::strlen(internalFile->d_name), [](char c){ return std::isdigit(c); } ))
+        {
+        // Here, we are using the all_of function which checks for a condition for all the files from as specified 
+        // in the arguments from first tolast using the given condition for which we have passed the function as an 
+        // argument.
+        // The function parsed as the argument iterates through the name of the file and checks if each of the character
+        // in the directory name is a number.
+
+            processList.push_back(internalFile->d_name);
+            // Pushes the directory names in the vector form which are satisfying the condition so that we can access
+            // the files in a vector form.
+        }
+    }
+
+    if(closedir( directory ))
+    {
+    // Closes the directory and throw a runtime error is something unexpected is observed.
+        throw runtime_error(strerror(errno));
+    }
+
+    return processList;
+    // Returns the vector which contains the list ofall the process id.
+}

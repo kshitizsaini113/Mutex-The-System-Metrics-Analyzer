@@ -117,3 +117,35 @@ class ProcessParcer
         // accepts two arguments previousTime and currentTime.
 
 };
+
+string ProcessParcer::getProcessUpTime( string processId )
+{
+    string fetchedLine;
+    float processUpTime = 0;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + processId + "/" + Path::statPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    getline( fileStream, fetchedLine );
+    // The file is a single line file so we will fetch the file in a single line.
+
+    istringstream buffer( fetchedLine );
+    istream_iterator<string> begin( buffer ), end;
+    vector<string> values( begin, end );
+    // Processes the given line and stores it in a vector of strings by accessing the element.
+
+    processUpTime = float( stof( values[13] ) / sysconf(_SC_CLK_TCK) );
+    // values[13] <-> Process UpTime
+    //
+    // Amount of time that this process has been scheduled in user mode, measured in clock ticks
+    // (divide by sysconf(_SC_CLK_TCK)).  This includes guest time, guest_time (time spent running
+    // a virtual CPU), so that applications that are not aware of the guest time field
+    // do not lose that time from their calculations.
+    //
+    // REFRENCE: https://stackoverflow.com/questions/39066998/what-are-the-meaning-of-values-at-proc-pid-stat
+
+
+    return to_string( processUpTime );
+    // Return the Process Up Time in form of string.
+}

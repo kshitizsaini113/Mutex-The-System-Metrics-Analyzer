@@ -34,7 +34,7 @@ using std::strerror;
 class ProcessParcer
 {
     public:
-        static string getCommand( string processId );
+        static string getProcessCommand( string processId );
         // This function is used to retrive the base command from which the process was executed.
 
 
@@ -169,3 +169,17 @@ string ProcessParcer::getProcessCpuPercent( string processId )
     // Returns the process cpu percent in form of string.
 }
 
+string ProcessParcer::getProcessCommand( string processId )
+{
+    string fetchedLine;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream(( Path::basePath() + processId + Path::cmdPath()));
+    // Gets the stream of file from the getStream function.
+
+    std::getline(fileStream, fetchedLine);
+    // Fetches the line from the file.
+
+    return fetchedLine;
+    // Return the process command which was fetched.
+}

@@ -149,3 +149,53 @@ string ProcessParcer::getProcessRamPercent( string processId )
     return to_string( ramUsage );
     // Returns the RAM Usage in form of string.
 }
+
+string ProcessParcer::getProcessUser( string processId )
+{
+    string fetchedLine;
+    string fieldName = "Uid:";
+    string userId = "";
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + processId + "/" + Path::statusPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+        // Gets a new line everytime and iterates over the file till the field Uid is found.
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+            // Processes the given line and stores it in a vector of strings by accessing the element
+            // over the index 1.
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+
+            userId = values[1];
+            break;
+        }
+    }
+
+    fieldName = ("x:" + userId);
+    string userName = "";
+    // Initializes the basic variables required for the functionality.
+
+    fileStream = Util::getStream( Path::passwdFile() );
+    // Gets the stream of file from the getStream function.
+
+    while(getline(fileStream, fetchedLine))
+    {
+        // Gets a new line everytime and iterates over the file till the feild is found in the line.
+        if(fetchedLine.find(fieldName) != std::string::npos)
+        {
+            userName = fetchedLine.substr(0, fetchedLine.find(":"));
+            // Fetches the username from the line.
+
+            return userName;
+            // Returns the username for the user who is the parent for the process.
+        }
+    }
+
+    return userName;
+    // Returns nothing if no username is found.
+}

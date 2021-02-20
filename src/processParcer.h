@@ -149,3 +149,27 @@ string ProcessParcer::getProcessUpTime( string processId )
     return to_string( processUpTime );
     // Return the Process Up Time in form of string.
 }
+
+long int ProcessParcer::getSystemUpTime()
+{
+    string fetchedLine;
+    long int systemUpTime;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::upTimePath() ) );
+    // Gets the stream of file from the getStream function.
+
+    getline( fileStream, fetchedLine );
+    // The file is a single line file so we will fetch the file in a single line.
+
+    istringstream buffer( fetchedLine );
+    istream_iterator<string> begin( buffer ), end;
+    vector<string> values( begin, end );
+    // Processes the given line and stores it in a vector of strings by accessing the element.
+
+    systemUpTime = stoi( values[0] );
+    // Fetches the system up time from the line fetched which was present at the first index.
+
+    return systemUpTime;
+    // Return the system up time for the system.
+}

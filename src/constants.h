@@ -42,6 +42,11 @@ class Path
             return "/cmdline";
         }
 
+        static string cpuinfo()
+        {
+            return "cpuinfo";
+        }
+
         static string statusPath()
         {
             return "/status";

@@ -116,6 +116,11 @@ class ProcessParcer
         // so the only way to get valid CPU statistics are by specifying a time interval. Therefore, the function
         // accepts two arguments previousTime and currentTime.
 
+        static int getNumberOfCores();
+        // This function works with /proc/cpuinfo file and, iterates over all the fields from the files and
+        // returns the numbers of cores present in our device. The total number of cores of cpu is stored in 
+        // /proc/cpuinfo file and the data is located under cpu cores field.
+
 };
 
 vector<string> ProcessParcer::getProcessIdList()
@@ -167,4 +172,35 @@ vector<string> ProcessParcer::getProcessIdList()
 
     return processList;
     // Returns the vector which contains the list ofall the process id.
+}
+
+int ProcessParcer::getNumberOfCores()
+{
+    string fetchedLine;
+    string fieldName = "cpu cores";
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::cpuinfo() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+        // Gets a new line everytime and iterates over the file till the field VmData is found.
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 3 and further converting return the value by converting the string to int.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            return stoi(values[3]);
+            // Returns the number of cores of cpu.
+        }
+    }
+
+    return 0;
+    // Returns 0 if something unexpected has occured.
 }

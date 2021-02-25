@@ -183,3 +183,34 @@ string ProcessParcer::getProcessCommand( string processId )
     return fetchedLine;
     // Return the process command which was fetched.
 }
+
+string ProcessParcer::getSystemKernelVersion()
+{
+    string fetchedLine;
+    string fieldName = "Linux version ";
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::versionPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+    // Gets a new line everytime and iterates over the file till the accepted fields are fetched.
+
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 2.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            return values[2];
+            // Returns the SystemKernelVersion.
+        }
+    }
+
+    return "";
+}

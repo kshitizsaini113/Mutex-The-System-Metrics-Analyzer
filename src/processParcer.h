@@ -173,3 +173,21 @@ long int ProcessParcer::getSystemUpTime()
     return systemUpTime;
     // Return the system up time for the system.
 }
+
+string getCpuStatistics(vector<string> values1, vector<string> values2)
+{
+    float activeTime = ProcessParcer::getSystemActiveCpuTime(values2) - ProcessParcer::getSystemActiveCpuTime(values1);
+    // Calculates the system active cpu time by observing two different vector values fetched from
+    // the getSystemCpuPercent and applying the getSystemActiveCpuTime filter.
+    float idleTime = ProcessParcer::getSystemIdleCpuTime(values2) - ProcessParcer::getSystemIdleCpuTime(values1);
+    // Calculates the system idle cpu time by observing two different vector values fetched from
+    // the getSystemCpuPercent and applying the getSystemIdleCpuTime filter.
+    float totalTime = activeTime + idleTime;
+    // Sums up the activeTime and idleTime to calculate totalTime
+
+    float cpuStats = 100.0*(activeTime / totalTime);
+    // Uses the formula to calculate CPU Stats.
+
+    return to_string(cpuStats);
+    // Returning CPU Stats in form of a string.
+}

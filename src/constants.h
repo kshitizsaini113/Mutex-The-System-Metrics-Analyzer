@@ -17,7 +17,7 @@ enum CPU_States
     S_IRQ,
     S_SOFTIRQ,
     S_STEAL,
-    s_GUEST,
+    S_GUEST,
     S_GUEST_NICE
 };
 // Enumerated DataType for CPU States

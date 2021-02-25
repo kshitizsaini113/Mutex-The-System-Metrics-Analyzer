@@ -108,7 +108,7 @@ class ProcessParcer
 
 
         static int getOsName();
-        // Thi function works with /etc/os-release and parses the line containing the Operating System Name.
+        // This function works with /etc/os-release and parses the line containing the Operating System Name.
 
 
         static string getCpuStatistics(vector<string> values1, vector<string> values2);
@@ -120,6 +120,14 @@ class ProcessParcer
         // This function works with /proc/cpuinfo file and, iterates over all the fields from the files and
         // returns the numbers of cores present in our device. The total number of cores of cpu is stored in 
         // /proc/cpuinfo file and the data is located under cpu cores field.
+
+        static float getSystemActiveCpuTime(vector<string> values);
+        // This function works with getSystemCpuPercent function to fetch a specific core output and filters
+        // the values based on the index and returns the active cpu time.
+
+        static float getSystemIdleCpuTime(vector<string> values);
+        // This function works with getSystemCpuPercent function to fetch a specific core output and filters
+        // the values based on the index and returns the idle cpu time.
 
 };
 
@@ -203,4 +211,53 @@ int ProcessParcer::getNumberOfCores()
 
     return 0;
     // Returns 0 if something unexpected has occured.
+}
+
+vector<string> ProcessParcer::getSystemCpuPercent( string coreNumber )
+{
+    string fetchedLine;
+    string fieldName = "cpu" + coreNumber;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::statPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+        // Gets a new line everytime and iterates over the file till the field VmData is found.
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 3 and further converting return the value by converting the string to int.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            return values;
+            // Returns the number of cores of cpu.
+        }
+    }
+
+    return ( vector<string>() );
+    // Returns an empty vector is noentry is found for the given core number.
+}
+
+float ProcessParcer::getSystemActiveCpuTime( vector<string> values )
+{
+    return ( stof(values[S_USER]) + 
+             stof(values[S_NICE]) + 
+             stof(values[S_SYSTEM]) + 
+             stof(values[S_IRQ]) + 
+             stof(values[S_SOFTIRQ]) + 
+             stof(values[S_STEAL]) + 
+             stof(values[S_GUEST]) + 
+             stof(values[S_GUEST_NICE]) );
+}
+
+float ProcessParcer::getSystemIdleCpuTime(vector<string> values)
+{
+    return ( stof(values[S_IDLE]) + 
+             stof(values[S_IOWAIT]) );
 }

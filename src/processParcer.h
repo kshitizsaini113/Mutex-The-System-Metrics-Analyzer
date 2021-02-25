@@ -199,3 +199,74 @@ string ProcessParcer::getProcessUser( string processId )
     return userName;
     // Returns nothing if no username is found.
 }
+
+float ProcessParcer::getSystemRamPercent()
+{
+    string fetchedLine;
+    string fieldName1 = "MemAvailable:";
+    string fieldName2 = "MemFree:";
+    string fieldName3 = "Buffers:";
+    float totalMemory = 0;
+    float freeMemory = 0;
+    float bufferMemory = 0;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::memInfoPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+    // Gets a new line everytime and iterates over the file till the accepted fields are fetched.
+
+        if ( totalMemory !=0 && freeMemory != 0 )
+        {
+        // Breaks the loop if both the totalMemory and freeMemory is found.
+            break;
+        }
+        if( fetchedLine.compare( 0, fieldName1.size(), fieldName1 ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 1 and further allocating it as totalMemory.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            totalMemory = stof( values[1] );
+            // Allocates the totalMemory.
+        }
+        if( fetchedLine.compare( 0, fieldName2.size(), fieldName2 ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 1 and further allocating it as freeMemory.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            freeMemory = stof( values[1] );
+            // Allocates the freeMemory.
+        }
+        if( fetchedLine.compare( 0, fieldName2.size(), fieldName2 ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 1 and further allocating it as freeMemory.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            freeMemory = stof( values[1] );
+            // Allocates the freeMemory.
+        }
+    }
+
+    float systemRamPercent = float ( 100.0 * ( 1 - ( freeMemory / ( totalMemory - bufferMemory ) ) ) );
+    // Calculates the systemRamPercent from the formula.
+
+    return systemRamPercent;
+    // Returns the system ram percent as a floating point variable.
+}

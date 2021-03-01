@@ -107,7 +107,7 @@ class ProcessParcer
         // /proc/stat file and the data is located under procs_running field.
 
 
-        static int getOsName();
+        static string getOsName();
         // Thi function works with /etc/os-release and parses the line containing the Operating System Name.
 
 
@@ -209,6 +209,40 @@ string ProcessParcer::getSystemKernelVersion()
 
             return values[2];
             // Returns the SystemKernelVersion.
+        }
+    }
+
+    return "";
+}
+
+string ProcessParcer::getOsName()
+{
+    string fetchedLine;
+    string fieldName = "PRETTY_NAME=";
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( "/etc/os-release" ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+    // Gets a new line everytime and iterates over the file till the accepted fields are fetched.
+
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+        // Processes the given line and fetches the os version from the line.
+
+            size_t value = fetchedLine.find( "=" );
+            value++;
+            // Find the index at which the = value is present and stores it's index.
+
+            string osVersion = fetchedLine.substr( value );
+            // Fetch the os name from the substring.
+            osVersion.erase( remove(osVersion.begin(), osVersion.end(), '"'), osVersion.end() );
+            // Removes the " from the parsed string so as to fetch only the OS Version.
+
+            return osVersion;
+            // Returns the OS Version.
         }
     }
 

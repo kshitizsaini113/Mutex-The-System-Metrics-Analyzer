@@ -261,3 +261,44 @@ float ProcessParcer::getSystemIdleCpuTime(vector<string> values)
     return ( stof(values[S_IDLE]) + 
              stof(values[S_IOWAIT]) );
 }
+
+int ProcessParcer::getTotalThreads()
+{
+    string fetchedLine;
+    int numberOfThreads = 0;
+    string fieldName = "Threads:";
+    vector<string> processIdList = ProcessParcer::getProcessIdList();
+    // Initializes the basic variables required for the functionality.
+
+    for(int process=0; process<processIdList.size(); process++)
+    {
+        string pid = processIdList[process];
+
+        ifstream fileStream = Util::getStream( ( Path::basePath() + pid + Path::statusPath() ) );
+        // Gets the stream of file from the getStream function.
+
+        while( getline( fileStream, fetchedLine ) )
+        {
+            // Gets a new line everytime and iterates over the file till the field VmData is found.
+            if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+            {
+            // Processes the given line and stores it in a vector of strings by accessing the element
+            // over the index 1 and further increasing the number of threads.
+
+                istringstream buffer( fetchedLine );
+                istream_iterator<string> begin( buffer ), end;
+                vector<string> values( begin, end );
+                // Processes the given line and stores it in a vector of strings by accessing the element.
+
+                numberOfThreads += stoi(values[1]);
+                // Increases the number of threads.
+
+                break;
+                // Once the thread field is encountered, no reason to search the file further so break
+                // the current iteration and procees to next process.
+            }
+        }
+    }
+
+    return numberOfThreads;
+}

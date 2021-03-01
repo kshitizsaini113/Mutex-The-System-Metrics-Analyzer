@@ -270,3 +270,38 @@ float ProcessParcer::getSystemRamPercent()
     return systemRamPercent;
     // Returns the system ram percent as a floating point variable.
 }
+
+int ProcessParcer::getTotalNumberOfProcesses()
+{
+    string fetchedLine;
+    int numberOfProcesses = 0;
+    string fieldName = "processes";
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::statPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+        // Gets a new line everytime and iterates over the file till the field VmData is found.
+
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 1 and further increasing the number of process.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            numberOfProcesses += stoi(values[1]);
+            // Increases the number of processes.
+
+            break;
+            // Once the process field is encountered, no reason to search the file further
+        }
+    }
+
+    return numberOfProcesses;
+}

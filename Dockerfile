@@ -6,5 +6,5 @@ RUN mkdir /mutex
 RUN mkdir /preudoproc
 RUN mkdir /pseudoetc
 COPY ./src /mutex
-RUN c++ ./src/main.cpp -o /usr/bin/mutex
+RUN c++ /mutex/main.cpp -o /usr/bin/mutex
 RUN rm -rvf /mutex

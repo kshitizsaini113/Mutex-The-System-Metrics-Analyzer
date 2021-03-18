@@ -1,4 +1,5 @@
 #include <iostream>
+#include "processParcer.h"
 // Importing the required headers.
 
 using std::cout;
@@ -8,5 +9,14 @@ using std::endl;
 
 int main()
 {
+    vector <string> processId = ProcessParcer::getProcessIdList();
+
+    std::cout<<"PID\tRAM Size\tProcessUP\tSystemUP\tCPU Percent\tUser\tCommand"<<std::endl;
+
+    for(int i=0; i<processId.size(); i++)
+    {
+        std::cout<<processId.at(i)<<"\t";
+    }
+
     return 0;
 }

@@ -1,3 +1,6 @@
+#ifndef __PROCESSPARSER__
+#define __PROCESSPARSER__
+
 #include <algorithm>
 #include <iostream>
 #include <math.h>
@@ -730,3 +733,5 @@ int ProcessParcer::getTotalNumberOfProcesses()
 
     return numberOfProcesses;
 }
+
+#endif

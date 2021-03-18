@@ -302,3 +302,112 @@ int ProcessParcer::getTotalThreads()
 
     return numberOfThreads;
 }
+
+string ProcessParcer::getProcessUpTime( string processId )
+{
+    string fetchedLine;
+    float processUpTime = 0;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + processId + "/" + Path::statPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    getline( fileStream, fetchedLine );
+    // The file is a single line file so we will fetch the file in a single line.
+
+    istringstream buffer( fetchedLine );
+    istream_iterator<string> begin( buffer ), end;
+    vector<string> values( begin, end );
+    // Processes the given line and stores it in a vector of strings by accessing the element.
+
+    processUpTime = float( stof( values[13] ) / sysconf(_SC_CLK_TCK) );
+    // values[13] <-> Process UpTime
+    //
+    // Amount of time that this process has been scheduled in user mode, measured in clock ticks
+    // (divide by sysconf(_SC_CLK_TCK)).  This includes guest time, guest_time (time spent running
+    // a virtual CPU), so that applications that are not aware of the guest time field
+    // do not lose that time from their calculations.
+    //
+    // REFRENCE: https://stackoverflow.com/questions/39066998/what-are-the-meaning-of-values-at-proc-pid-stat
+
+
+    return to_string( processUpTime );
+    // Return the Process Up Time in form of string.
+}
+
+long int ProcessParcer::getSystemUpTime()
+{
+    string fetchedLine;
+    long int systemUpTime;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::upTimePath() ) );
+    // Gets the stream of file from the getStream function.
+
+    getline( fileStream, fetchedLine );
+    // The file is a single line file so we will fetch the file in a single line.
+
+    istringstream buffer( fetchedLine );
+    istream_iterator<string> begin( buffer ), end;
+    vector<string> values( begin, end );
+    // Processes the given line and stores it in a vector of strings by accessing the element.
+
+    systemUpTime = stoi( values[0] );
+    // Fetches the system up time from the line fetched which was present at the first index.
+
+    return systemUpTime;
+    // Return the system up time for the system.
+}
+
+string getCpuStatistics(vector<string> values1, vector<string> values2)
+{
+    float activeTime = ProcessParcer::getSystemActiveCpuTime(values2) - ProcessParcer::getSystemActiveCpuTime(values1);
+    // Calculates the system active cpu time by observing two different vector values fetched from
+    // the getSystemCpuPercent and applying the getSystemActiveCpuTime filter.
+    float idleTime = ProcessParcer::getSystemIdleCpuTime(values2) - ProcessParcer::getSystemIdleCpuTime(values1);
+    // Calculates the system idle cpu time by observing two different vector values fetched from
+    // the getSystemCpuPercent and applying the getSystemIdleCpuTime filter.
+    float totalTime = activeTime + idleTime;
+    // Sums up the activeTime and idleTime to calculate totalTime
+
+    float cpuStats = 100.0*(activeTime / totalTime);
+    // Uses the formula to calculate CPU Stats.
+
+    return to_string(cpuStats);
+    // Returning CPU Stats in form of a string.
+}
+
+int ProcessParcer::getNumberOfRunningProcesses()
+{
+    string fetchedLine;
+    int numberOfRunningProcesses = 0;
+    string fieldName = "procs_running";
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::statPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+        // Gets a new line everytime and iterates over the file till the field VmData is found.
+
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 1 and further increasing the number of running processes.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            numberOfRunningProcesses += stoi(values[1]);
+            // Increases the number of processes.
+
+            break;
+            // Once the process field is encountered, no reason to search the file further.
+        }
+    }
+
+    return numberOfRunningProcesses;
+}

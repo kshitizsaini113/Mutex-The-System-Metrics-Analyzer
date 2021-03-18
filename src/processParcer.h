@@ -34,7 +34,7 @@ using std::strerror;
 class ProcessParcer
 {
     public:
-        static string getCommand( string processId );
+        static string getProcessCommand( string processId );
         // This function is used to retrive the base command from which the process was executed.
 
 

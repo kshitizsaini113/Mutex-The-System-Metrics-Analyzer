@@ -107,7 +107,7 @@ class ProcessParcer
         // /proc/stat file and the data is located under procs_running field.
 
 
-        static int getOsName();
+        static string getOsName();
         // This function works with /etc/os-release and parses the line containing the Operating System Name.
 
 
@@ -410,4 +410,135 @@ int ProcessParcer::getNumberOfRunningProcesses()
     }
 
     return numberOfRunningProcesses;
+}
+
+string ProcessParcer::getProcessCpuPercent( string processId )
+{
+    string fetchedLine;
+    string value;
+    float processCpuPercent;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + processId + "/" + Path::statPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    getline( fileStream, fetchedLine );
+    // The file is a single line file so we will fetch the file in a single line.
+
+    istringstream buffer( fetchedLine );
+    istream_iterator<string> begin( buffer ), end;
+    vector<string> values( begin, end );
+    // Processes the given line and stores it in a vector of strings by accessing the element.
+
+    float utime = stof(ProcessParcer::getProcessUpTime( processId ));
+    float uptime = ProcessParcer::getSystemUpTime();
+    // Uses the pre-defined functions to get the values of variables like process uptime and system
+    // uptime.
+
+    float stime = stof( values[14] );
+    // Measures the amount of time that this process has been scheduled in kernel mode, measured in
+    // clock ticks (divide by sysconf(_SC_CLK_TCK)).
+    float cutime = stof( values[15] );
+    // Measures the amount of time that this process's waited-for children have been scheduled in
+    // user mode, measured in clock ticks (divide by sysconf(_SC_CLK_TCK)).
+    float cstime = stof( values[16] );
+    // Measures the amount of time that this process's waited-for children have been scheduled in
+    // kernel mode, measured in clock ticks (divide by sysconf(_SC_CLK_TCK)).
+    float starttime = stof( values[21] );
+    // Measures the time the process started after system boot. The value is expressed in clock ticks
+    // (divide by sysconf(_SC_CLK_TCK)).
+
+    float freq = sysconf( _SC_CLK_TCK );
+    // Stores the system clock tick frequency. Mostly the System clock tick frequency is 100.
+
+    float totaltime = utime + stime + cutime + cstime;
+    // Calculates the total time while the process is running in CPU. The time is in system tick freq.
+    float processTotalTime = uptime - ( starttime / freq );
+    // Calculates the seconds elapsed since the process was started first.
+
+    processCpuPercent = 100 * ( ( totaltime / freq ) / processTotalTime );
+    // Calculates the cpu percent for the current process.
+
+    return to_string( processCpuPercent );
+    // Returns the process cpu percent in form of string.
+}
+
+string ProcessParcer::getProcessCommand( string processId )
+{
+    string fetchedLine;
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream(( Path::basePath() + processId + Path::cmdPath()));
+    // Gets the stream of file from the getStream function.
+
+    std::getline(fileStream, fetchedLine);
+    // Fetches the line from the file.
+
+    return fetchedLine;
+    // Return the process command which was fetched.
+}
+
+string ProcessParcer::getSystemKernelVersion()
+{
+    string fetchedLine;
+    string fieldName = "Linux version ";
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( Path::basePath() + Path::versionPath() ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+    // Gets a new line everytime and iterates over the file till the accepted fields are fetched.
+
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+        // Processes the given line and stores it in a vector of strings by accessing the element
+        // over the index 2.
+
+            istringstream buffer( fetchedLine );
+            istream_iterator<string> begin( buffer ), end;
+            vector<string> values( begin, end );
+            // Processes the given line and stores it in a vector of strings by accessing the element.
+
+            return values[2];
+            // Returns the SystemKernelVersion.
+        }
+    }
+
+    return "";
+}
+
+string ProcessParcer::getOsName()
+{
+    string fetchedLine;
+    string fieldName = "PRETTY_NAME=";
+    // Initializes the basic variables required for the functionality.
+
+    ifstream fileStream = Util::getStream( ( "/etc/os-release" ) );
+    // Gets the stream of file from the getStream function.
+
+    while( getline( fileStream, fetchedLine ) )
+    {
+    // Gets a new line everytime and iterates over the file till the accepted fields are fetched.
+
+        if( fetchedLine.compare( 0, fieldName.size(), fieldName ) == 0 )
+        {
+        // Processes the given line and fetches the os version from the line.
+
+            size_t value = fetchedLine.find( "=" );
+            value++;
+            // Find the index at which the = value is present and stores it's index.
+
+            string osVersion = fetchedLine.substr( value );
+            // Fetch the os name from the substring.
+            osVersion.erase( remove(osVersion.begin(), osVersion.end(), '"'), osVersion.end() );
+            // Removes the " from the parsed string so as to fetch only the OS Version.
+
+            return osVersion;
+            // Returns the OS Version.
+        }
+    }
+
+    return "";
 }
